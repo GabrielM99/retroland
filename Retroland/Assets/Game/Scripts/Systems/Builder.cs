@@ -10,7 +10,7 @@ namespace Game
 {
     public class Builder
     {
-        private const string ClientPath = "Builds/Client";
+        private const string ClientPath = "Builds";
         private const string ServerPath = "Builds/Server";
 
         [MenuItem("Build/Build All")]
@@ -24,8 +24,8 @@ namespace Game
         public static void BuildClient()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-            buildPlayerOptions.locationPathName = $"{Path.Combine(ClientPath, Application.productName)} Client.exe";
-            buildPlayerOptions.target = EditorUserBuildSettings.activeBuildTarget;
+            buildPlayerOptions.locationPathName = $"{Path.Combine(ClientPath, Application.productName)} Client";
+            buildPlayerOptions.target = BuildTarget.WebGL;
             buildPlayerOptions.scenes = EditorBuildSettings.scenes.Select((scene) => scene.path).ToArray();
             buildPlayerOptions.options = BuildOptions.CompressWithLz4HC;
 
@@ -37,7 +37,7 @@ namespace Game
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.locationPathName = $"{Path.Combine(ServerPath, Application.productName)} Server.exe";
-            buildPlayerOptions.target = EditorUserBuildSettings.activeBuildTarget;
+            buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
             buildPlayerOptions.scenes = EditorBuildSettings.scenes.Select((scene) => scene.path).ToArray();
             buildPlayerOptions.options = BuildOptions.CompressWithLz4HC | BuildOptions.EnableHeadlessMode;
 
