@@ -10,7 +10,7 @@ namespace Game
 {
     public class Builder
     {
-        private const string ClientPath = "Builds";
+        private const string ClientPath = "Builds/Client";
         private const string ServerPath = "Builds/Server";
 
         [MenuItem("Build/Build All")]
@@ -24,7 +24,7 @@ namespace Game
         public static void BuildClient()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-            buildPlayerOptions.locationPathName = $"{Path.Combine(ClientPath, Application.productName)} Client";
+            buildPlayerOptions.locationPathName = ClientPath;
             buildPlayerOptions.target = BuildTarget.WebGL;
             buildPlayerOptions.scenes = EditorBuildSettings.scenes.Select((scene) => scene.path).ToArray();
             buildPlayerOptions.options = BuildOptions.CompressWithLz4HC;
