@@ -61,8 +61,8 @@ namespace Game
                     Instance.StopHost();
                 }
 
-                //Instance.StartHost();
-                Instance.StartClient();
+                Instance.StartHost();
+                //Instance.StartClient();
             }
             else
             {
