@@ -27,7 +27,6 @@ namespace Game
             buildPlayerOptions.locationPathName = ClientPath;
             buildPlayerOptions.target = BuildTarget.WebGL;
             buildPlayerOptions.scenes = EditorBuildSettings.scenes.Select((scene) => scene.path).ToArray();
-            buildPlayerOptions.options = BuildOptions.CompressWithLz4HC;
 
             BuildPipeline.BuildPlayer(buildPlayerOptions);
         }
