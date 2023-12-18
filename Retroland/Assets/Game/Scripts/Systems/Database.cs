@@ -41,9 +41,25 @@ namespace Game
 
         private static MySqlConnection connection { get; set; }
 
-        static Database()
+        public static void Connect(string server, string database, string user, string password, bool pooling = true)
         {
-            Connect("127.0.0.1", "retroland", "root", "");
+            if (connection == null)
+            {
+                connection = new MySqlConnection($"server={server};database={database};user={user};password={password}");
+                connection.Open();
+                Debug.Log("Connected to database!");
+            }
+            else
+            {
+                Debug.LogError("A connection to the database is already established. Use Disconnect() first if it was intentional");
+            }
+        }
+
+        public static void Disconnect()
+        {
+            connection.Close();
+            connection = null;
+            Debug.Log("Disconnected from database!");
         }
 
         public static async Task<bool> Register(string username, string password)
@@ -139,13 +155,6 @@ namespace Game
             MySqlCommand command = new MySqlCommand(query.text, connection);
             command.Prepare(query.parameters);
             return command;
-        }
-
-        private static void Connect(string server, string database, string user, string password, bool pooling = true)
-        {
-            connection = new MySqlConnection($"server={server};database={database};user={user};password={password}");
-            connection.Open();
-            Debug.Log("Connected to database!");
         }
 
         private static HashSalt HashPassword(string password)

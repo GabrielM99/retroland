@@ -24,9 +24,10 @@ namespace Game
         public static void BuildClient()
         {
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
-            buildPlayerOptions.locationPathName = ClientPath;
-            buildPlayerOptions.target = BuildTarget.WebGL;
+            buildPlayerOptions.locationPathName = $"{Path.Combine(ClientPath, Application.productName)} Client.exe";
+            buildPlayerOptions.target = BuildTarget.StandaloneWindows64;
             buildPlayerOptions.scenes = EditorBuildSettings.scenes.Select((scene) => scene.path).ToArray();
+            buildPlayerOptions.options = BuildOptions.CompressWithLz4HC;
 
             BuildPipeline.BuildPlayer(buildPlayerOptions);
         }

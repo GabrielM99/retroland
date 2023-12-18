@@ -1,11 +1,12 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Game.Entities;
 using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using static Game.LoginAuthenticator;
+using static Game.UserAuthenticator;
 
 namespace Game
 {
@@ -15,14 +16,13 @@ namespace Game
         [Scene][SerializeField] private string _playScene;
 
         public static Network Instance { get; private set; }
-        public static RegisterProtocol RegisterProtocol { get; private set; }
         public static CreateCharacterProtocol CreateCharacterProtocol { get; private set; }
         public static GetCharactersProtocol GetCharactersProtocol { get; private set; }
         public static PlayProtocol PlayProtocol { get; private set; }
         public static Action OnServerStartHandler { get; set; }
         public static Action OnClientStartHandler { get; set; }
 
-        private static LoginAuthenticator Authenticator { get; set; }
+        private static UserAuthenticator UserAuthenticator { get; set; }
         private static Dictionary<NetworkConnection, UserData> UserDataByConnection { get; set; }
         private static Dictionary<int, NetworkConnection> ConnectionsByUserID { get; set; }
 
@@ -32,8 +32,7 @@ namespace Game
         {
             base.Awake();
             Instance = singleton as Network;
-            Authenticator = authenticator as LoginAuthenticator;
-            RegisterProtocol = new RegisterProtocol();
+            UserAuthenticator = authenticator as UserAuthenticator;
             CreateCharacterProtocol = new CreateCharacterProtocol();
             GetCharactersProtocol = new GetCharactersProtocol();
             PlayProtocol = new PlayProtocol();
@@ -47,40 +46,41 @@ namespace Game
             base.Start();
         }
 
-        public static void Login(string username, string password, Action<LoginResponseMessage> onResponse)
+        public static void Register(string username, string password, Action<UserResponseMessage> onResponse)
         {
-            Authenticator.username = username;
-            Authenticator.password = password;
-            Authenticator.onResponse -= onResponse;
-            Authenticator.onResponse += onResponse;
+            UserAuthenticator.username = username;
+            UserAuthenticator.password = password;
+            UserAuthenticator.requestType = UserRequestType.Register;
+            UserAuthenticator.onResponse -= onResponse;
+            UserAuthenticator.onResponse += onResponse;
 
-            if (Application.isEditor)
-            {
-                if (NetworkServer.active)
-                {
-                    Instance.StopHost();
-                }
+            Connect();
+        }
 
-                Instance.StartHost();
-                //Instance.StartClient();
-            }
-            else
-            {
-                Instance.StartClient();
-            }
+        public static void Login(string username, string password, Action<UserResponseMessage> onResponse)
+        {
+            UserAuthenticator.username = username;
+            UserAuthenticator.password = password;
+            UserAuthenticator.requestType = UserRequestType.Login;
+            UserAuthenticator.onResponse -= onResponse;
+            UserAuthenticator.onResponse += onResponse;
+
+            Connect();
+        }
+
+        private static void Connect()
+        {
+            Instance.StartClient();
+        }
+
+        private static void Disconnect()
+        {
+            Instance.StopClient();
         }
 
         public static void Logout()
         {
-            if (Application.isEditor)
-            {
-                Instance.StopHost();
-            }
-            else
-            {
-                Instance.StopClient();
-            }
-
+            Disconnect();
             SceneManager.LoadScene(Instance.offlineScene);
         }
 
@@ -109,6 +109,8 @@ namespace Game
         public override void OnStartServer()
         {
             base.OnStartServer();
+
+            Database.Connect("127.0.0.1", "retroland", "root", "");
 
             OnServerStartHandler?.Invoke();
 
@@ -153,6 +155,12 @@ namespace Game
         {
             UnregisterUserConnection(conn);
             base.OnServerDisconnect(conn);
+        }
+
+        public override void OnStopServer()
+        {
+            base.OnStopServer();
+            Database.Disconnect();
         }
 
         public static void RegisterUserConnection(NetworkConnection connection, int userID)

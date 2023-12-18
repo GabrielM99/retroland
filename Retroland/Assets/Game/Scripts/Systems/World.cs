@@ -14,7 +14,7 @@ namespace Game
 
         public static Vector2 WorldToTilePosition(Vector2 position)
         {
-            return Vector2Int.FloorToInt(position);
+            return Vector2Int.FloorToInt(position) + Vector2.one * 0.5f;
         }
     }
 }

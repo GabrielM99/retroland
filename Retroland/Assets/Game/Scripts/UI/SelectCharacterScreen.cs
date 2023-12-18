@@ -24,6 +24,7 @@ namespace Game.UI
         {
             Network.PlayProtocol.Execute(new PlayRequestMessage(SelectedCharacterData.id), (response) =>
             {
+
                 if (response.result)
                 {
                     Network.LoadPlayScene();

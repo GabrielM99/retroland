@@ -29,7 +29,7 @@ namespace Game
 
         public void Register()
         {
-            Network.RegisterProtocol.Execute(new RegisterRequestMessage(UsernameInput.text, PasswordInput.text), (response) =>
+            Network.Register(UsernameInput.text, PasswordInput.text, (response) =>
             {
                 if (response.result)
                 {
